@@ -1,58 +1,33 @@
 import {
-  REGISTER_REQUEST,
-  REGISTER_SUCCESS,
-  REGISTER_FAILURE,
   ADD_USER,
   EDIT_USER,
   DELETE_USER,
+  FETCH_USERS,
+  FETCH_USER_BY_ID
 } from '../types/userTypes';
 
 const initialState = {
-  loading: false,
-  token: null,
-  role: null,
-  user: null,  // usuario registrado
-  users: [],   // lista de usuarios (para agregar, editar, eliminar)
-  error: null,
+  user: null,   // usuario individual (por ejemplo, al ver un perfil)
+  users: [],    // lista completa de usuarios
 };
 
 export default function userReducer(state = initialState, action) {
   switch (action.type) {
-    case REGISTER_REQUEST:
-      return { ...state, loading: true, error: null };
+    case FETCH_USERS:
+      return { ...state, users: action.payload };
 
-    case REGISTER_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        token: action.payload.token,
-        role: action.payload.role,
-        user: action.payload.user,
-        error: null,
-      };
-
-    case REGISTER_FAILURE:
-      return { ...state, loading: false, error: action.payload };
+    case FETCH_USER_BY_ID:
+      return { ...state, user: action.payload };
 
     case ADD_USER:
-      return {
-        ...state,
-        users: [...state.users, action.payload],
-      };
+      return { ...state, users: [...state.users, action.payload] };
 
     case EDIT_USER:
-      return {
-        ...state,
-        users: state.users.map(user =>
-          user._id === action.payload._id ? { ...user, ...action.payload } : user
-        ),
-      };
+      return { ...state, users: state.users.map(user => user._id === action.payload._id ? { ...user, ...action.payload } : user ) };
 
     case DELETE_USER:
-      return {
-        ...state,
-        users: state.users.filter(user => user._id !== action.payload.id),
-      };
+      return { ...state, users: state.users.filter(user => user._id !== action.payload) };
+
     default:
       return state;
   }

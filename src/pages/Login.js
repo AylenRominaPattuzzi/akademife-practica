@@ -5,7 +5,7 @@ import Loading from '../components/Loading';
 import FieldError from '../components/FieldError'; 
 import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { loginUser } from '../features/auth';
+import { loginUser } from '../redux/actions/authActions';
 import { validateForm, guardarTokenYRedirigir } from '../utils/formUtils';
 
 const Login = ({ auth, loginUser }) => {
@@ -31,7 +31,6 @@ const Login = ({ auth, loginUser }) => {
     //Previene múltiples envíos si ya se está cargando
     if (auth.loading) return;
 
-    // Valida el formulario con función externa
     const errors = validateForm(email, password);
 
     // Si hay errores, los setea en el estado y no continúa

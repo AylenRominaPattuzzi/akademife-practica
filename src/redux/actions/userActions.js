@@ -1,41 +1,38 @@
+import axiosInstance from "../../api/axiosInstance";
 import {
-    REGISTER_REQUEST,
-    REGISTER_SUCCESS,
-    REGISTER_FAILURE,
-    ADD_USER,
-    EDIT_USER,
-    DELETE_USER,
-} from '../types/userTypes'
+  ADD_USER,
+  EDIT_USER,
+  DELETE_USER,
+  FETCH_USERS,
+  FETCH_USER_BY_ID,
+} from "../types/userTypes";
 
-// Acciones básicas de registro
-export const registerRequest = () => ({ type: REGISTER_REQUEST });
+// Obtener todos los usuarios
+export const fetchUsers = () => async dispatch => {
+  const response = await axiosInstance.get("/users");
+  dispatch({ type: FETCH_USERS, payload: response.data });
+};
 
-export const registerSuccess = (token, role, user) => ({
-    type: REGISTER_SUCCESS,
-    payload: { token, role, user },
-});
+// Obtener un usuario por ID
+export const fetchUserById = (id) => async dispatch => {
+  const response = await axiosInstance.get(`/users/${id}`);
+  dispatch({ type: FETCH_USER_BY_ID, payload: response.data });
+};
 
-export const registerFailure = (error) => ({
-    type: REGISTER_FAILURE,
-    payload: error,
-});
+// Agregar un nuevo usuario
+export const addUser = (formData) => async dispatch => {
+  const response = await axiosInstance.post("/users", formData);
+  dispatch({ type: ADD_USER, payload: response.data });
+};
 
-// Acciones CRUD para usuarios
+// Editar un usuario existente
+export const editUser = (id, formData) => async dispatch => {
+  const response = await axiosInstance.put(`/users/${id}`, formData);
+  dispatch({ type: EDIT_USER, payload: response.data });
+};
 
-// Agregar un usuario (por ejemplo, al listado)
-export const addUser = (user) => ({
-    type: ADD_USER,
-    payload: user,
-});
-
-// Editar un usuario (recibe objeto usuario actualizado)
-export const editUser = (user) => ({
-    type: EDIT_USER,
-    payload: user,
-});
-
-// Eliminar usuario (por id)
-export const deleteUser = (userId) => ({
-    type: DELETE_USER,
-    payload: { id: userId },
-});
+// Eliminar un usuario
+export const deleteUser = (id) => async dispatch => {
+  await axiosInstance.delete(`/users/${id}`);
+  dispatch({ type: DELETE_USER, payload: id });
+};

@@ -1,7 +1,5 @@
-export const REGISTER_REQUEST = 'REGISTER_REQUEST';
-export const REGISTER_SUCCESS = 'REGISTER_SUCCESS';
-export const REGISTER_FAILURE = 'REGISTER_FAILURE';
-
-export const ADD_USER = 'ADD_USER';
-export const EDIT_USER = 'EDIT_USER';
-export const DELETE_USER = 'DELETE_USER';
+export const FETCH_USERS = "FETCH_USERS";
+export const FETCH_USER_BY_ID = "FETCH_USER_BY_ID";
+export const ADD_USER = "ADD_USER";
+export const EDIT_USER = "EDIT_USER";
+export const DELETE_USER = "DELETE_USER";
