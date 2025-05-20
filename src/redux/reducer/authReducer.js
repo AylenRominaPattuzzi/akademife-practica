@@ -1,4 +1,4 @@
-import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE} from '../types/authTypes';
+import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from '../types/authTypes';
 
 const initialState = {
     loading: false,
@@ -15,12 +15,14 @@ export default function authReducer(state = initialState, action) {
             return { ...state, loading: false, token: action.payload.token, role: action.payload.role, error: null };
         case LOGIN_FAILURE:
             return { ...state, loading: false, error: action.payload };
+        case LOGOUT:
+            localStorage.removeItem('token'); // Limpia token del storage
+            return { ...state, loading: false, token: null, role: null, error: null };
         default:
             return state;
     }
 }
 
 
-  
 
-  
+
