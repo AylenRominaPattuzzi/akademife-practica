@@ -5,10 +5,10 @@ import Loading from '../components/Loading';
 import FieldError from '../components/FieldError'; 
 import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { loginUserThunk } from '../features/auth';
+import { loginUser } from '../features/auth';
 import { validateForm, guardarTokenYRedirigir } from '../utils/formUtils';
 
-const Login = ({ auth, loginUserThunk }) => {
+const Login = ({ auth, loginUser }) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,7 +42,7 @@ const Login = ({ auth, loginUserThunk }) => {
 
     // Si no hay errores, borra errores anteriores y despacha acción de login
     setFieldErrors({});
-    loginUserThunk({ email, password });
+    loginUser({ email, password });
   };
 
   return (
@@ -95,7 +95,7 @@ const mapStateToProps = (state) => ({
 
 // Mapea la acción de login como prop
 const mapDispatchToProps = {
-  loginUserThunk,
+  loginUser,
 };
 
 // Exporta el componente conectado a Redux
