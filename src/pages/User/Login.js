@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Input from '../../components/Input'; 
 import Button from '../../components/Button'; 
-import Loading from '../../components/Loading'; 
 import FieldError from '../../components/FieldError'; 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; 
 import { connect } from 'react-redux';
 import { loginUser } from '../../redux/actions/authActions';
 import { validateForm } from '../../utils/formUtils';
 
-// Función para guardar token y redirigir
 const guardarTokenYRedirigir = (auth, navigate) => {
   localStorage.setItem('token', auth.token);
   localStorage.setItem('role', auth.role);
@@ -79,7 +77,9 @@ const Login = ({ auth, loginUser }) => {
               <Button type="submit" texto={auth.loading ? 'Cargando...' : 'Ingresar'} />
             </form>
 
-            {auth.loading && <Loading />}
+            <div className="ui message">
+              <Link to="/recover-password">¿Olvidaste tu contraseña?</Link>
+            </div>
           </div>
         </div>
       </div>
