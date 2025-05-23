@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Input from '../components/Input'; 
-import Button from '../components/Button'; 
-import Loading from '../components/Loading'; 
-import FieldError from '../components/FieldError'; 
+import Input from '../../components/Input'; 
+import Button from '../../components/Button'; 
+import Loading from '../../components/Loading'; 
+import FieldError from '../../components/FieldError'; 
 import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { loginUser } from '../redux/actions/authActions';
-import { validateForm } from '../utils/formUtils';
+import { loginUser } from '../../redux/actions/authActions';
+import { validateForm } from '../../utils/formUtils';
 
 // Función para guardar token y redirigir
 const guardarTokenYRedirigir = (auth, navigate) => {

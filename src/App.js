@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import Login from './pages/Login';
+import Login from './pages/User/Login';
 import CreatePatient from './pages/patient/CreatePatient';
 import ListPatients from './pages/patient/ListPatients';
 import Patient from './pages/patient/PatientDetail';
