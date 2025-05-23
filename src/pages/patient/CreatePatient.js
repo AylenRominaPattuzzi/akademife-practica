@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { connect } from 'react-redux';
@@ -8,14 +8,18 @@ import FieldError from '../../components/FieldError';
 import { useNavigate } from 'react-router-dom';
 import { Message } from '../../components/Message';
 
-const CreatePatient = ({ addPatient }) => {
+const CreatePatient = ({
+  addPatient,
+  isAddingPatient,
+  errorAddPatient
+}) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dni, setDni] = useState('');
   const [email, setEmail] = useState('');
   const [medicalCoverage, setMedicalCoverage] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
-  const [showMessage, setShowMessage] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const navigate = useNavigate();
 
@@ -23,7 +27,7 @@ const CreatePatient = ({ addPatient }) => {
     e.preventDefault();
 
     const patientData = { firstName, lastName, dni, email, medicalCoverage };
-    const errors = validatePatient(patientData); 
+    const errors = validatePatient(patientData);
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -32,24 +36,34 @@ const CreatePatient = ({ addPatient }) => {
 
     setFieldErrors({});
     await addPatient(patientData);
-    setShowMessage(true);
 
-    setTimeout(() => {
-      navigate('/patients');
-    }, 2000);
+    if (!errorAddPatient) {
+      setShowSuccessMessage(true);
+      setTimeout(() => navigate('/patients'), 2000);
+    }
   };
+
+  useEffect(() => {
+    if (errorAddPatient) {
+      setShowSuccessMessage(false);
+    }
+  }, [errorAddPatient]);
 
   return (
     <div className="ui segment">
-      {showMessage && (
+      {showSuccessMessage && (
         <Message message="Paciente agregado con éxito" stateMessage="positive" />
+      )}
+
+      {errorAddPatient && (
+        <Message message={errorAddPatient} stateMessage="negative" />
       )}
 
       <div className="ui middle aligned center aligned grid" style={{ height: '100vh' }}>
         <div className="column" style={{ maxWidth: 450 }}>
           <div className="ui card fluid">
             <div className="content">
-              <form className="ui form" onSubmit={handleSubmit} noValidate>
+              <form className={`ui form ${isAddingPatient ? 'loading' : ''}`} onSubmit={handleSubmit} noValidate>
                 <h2 className="ui header">Formulario Paciente</h2>
 
                 <Input
@@ -112,7 +126,7 @@ const CreatePatient = ({ addPatient }) => {
                 />
                 <FieldError message={fieldErrors.medicalCoverage} />
 
-                <Button type="submit" texto="Enviar" />
+                <Button type="submit" texto="Enviar" disabled={isAddingPatient} />
               </form>
             </div>
           </div>
@@ -122,8 +136,14 @@ const CreatePatient = ({ addPatient }) => {
   );
 };
 
+// Mapea los estados de carga y error desde Redux
+const mapStateToProps = (state) => ({
+  isAddingPatient: state.patient.isAddingPatient,
+  errorAddPatient: state.patient.errorAddPatient,
+});
+
 const mapDispatchToProps = {
   addPatient,
 };
 
-export default connect(null, mapDispatchToProps)(CreatePatient);
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePatient);

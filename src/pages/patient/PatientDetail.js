@@ -4,13 +4,20 @@ import { fetchPatients, editPatient } from '../../redux/actions/patientActions';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import Input from '../../components/Input';
-import { Message } from '../../components/Message';
 import Button from '../../components/Button';
-import Modal from '../../components/Model';
 import FieldError from '../../components/FieldError';
+import { Message } from '../../components/Message';
+import Modal from '../../components/Model';
 import { validatePatient } from '../../utils/ValidateForm';
 
-const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
+const PatientDetail = ({
+  patients,
+  fetchPatients,
+  editPatient,
+  isLoadingPatients,
+  isEditingPatient,
+  errorEditPatient
+}) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -19,12 +26,12 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
   const [dni, setDni] = useState('');
   const [email, setEmail] = useState('');
   const [medicalCoverage, setMedicalCoverage] = useState('');
-  const [disabled, setDisabled] = useState(true);
-  const [showMessage, setShowMessage] = useState(false);
-  const [open, setOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+  const [open, setOpen] = useState(false);
 
-  const patient = patients?.find(p => p._id === id);
+  const patient = patients.find(p => p._id === id);
 
   useEffect(() => {
     if (patients.length === 0) fetchPatients();
@@ -40,10 +47,10 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
     }
   }, [patient]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const errors = validatePatient({ firstName, lastName, dni, email, medicalCoverage });
+    const updatedPatient = { firstName, lastName, dni, email, medicalCoverage };
+    const errors = validatePatient(updatedPatient);
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -51,14 +58,19 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
     }
 
     setFieldErrors({});
-    editPatient(id, { firstName, lastName, dni, email, medicalCoverage });
-    setDisabled(true);
-    setShowMessage(true);
-
-    setTimeout(() => navigate('/patients'), 2000);
+    await editPatient(id, updatedPatient);
+    if (!isEditingPatient && !errorEditPatient) {
+      setShowSuccessMessage(true);
+      setDisabled(true);
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+        navigate('/patients');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
   };
 
-  const handleCancel = () => {
+  const handleCancelEdit = () => {
     if (patient) {
       setFirstName(patient.firstName || '');
       setLastName(patient.lastName || '');
@@ -72,25 +84,32 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
 
   return (
     <div className="ui segment">
-      {showMessage && (
+      {showSuccessMessage && (
         <Message message="Paciente editado con éxito" stateMessage="positive" />
+      )}
+
+      {errorEditPatient && (
+        <Message message={errorEditPatient} stateMessage="negative" />
       )}
 
       <div className="ui middle aligned center aligned grid" style={{ height: '100vh' }}>
         <div className="column" style={{ maxWidth: 450 }}>
           <div className="ui card fluid">
             <div className="content">
-              <form className="ui form" onSubmit={handleSubmit} noValidate>
+              <form
+                className={`ui form ${isLoadingPatients || isEditingPatient ? 'loading' : ''}`}
+                onSubmit={handleSubmit}
+                noValidate
+              >
                 <h2 className="ui header">Formulario Paciente</h2>
 
                 <Input
                   label="Nombre"
                   type="text"
-                  name="firstName"
                   value={firstName}
                   onChange={(e) => {
                     setFirstName(e.target.value);
-                    setFieldErrors((prev) => ({ ...prev, firstName: '' }));
+                    setFieldErrors(prev => ({ ...prev, firstName: '' }));
                   }}
                   disabled={disabled}
                   placeholder="Ingrese el nombre del paciente"
@@ -100,11 +119,10 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
                 <Input
                   label="Apellido"
                   type="text"
-                  name="lastName"
                   value={lastName}
                   onChange={(e) => {
                     setLastName(e.target.value);
-                    setFieldErrors((prev) => ({ ...prev, lastName: '' }));
+                    setFieldErrors(prev => ({ ...prev, lastName: '' }));
                   }}
                   disabled={disabled}
                   placeholder="Ingrese el apellido del paciente"
@@ -114,11 +132,10 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
                 <Input
                   label="DNI"
                   type="text"
-                  name="dni"
                   value={dni}
                   onChange={(e) => {
                     setDni(e.target.value);
-                    setFieldErrors((prev) => ({ ...prev, dni: '' }));
+                    setFieldErrors(prev => ({ ...prev, dni: '' }));
                   }}
                   disabled={disabled}
                   placeholder="Ingrese el DNI"
@@ -128,11 +145,10 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
                 <Input
                   label="Email"
                   type="email"
-                  name="email"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    setFieldErrors((prev) => ({ ...prev, email: '' }));
+                    setFieldErrors(prev => ({ ...prev, email: '' }));
                   }}
                   disabled={disabled}
                   placeholder="Ingrese el correo"
@@ -142,37 +158,23 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
                 <Input
                   label="Obra Social"
                   type="text"
-                  name="medicalCoverage"
                   value={medicalCoverage}
                   onChange={(e) => {
                     setMedicalCoverage(e.target.value);
-                    setFieldErrors((prev) => ({ ...prev, medicalCoverage: '' }));
+                    setFieldErrors(prev => ({ ...prev, medicalCoverage: '' }));
                   }}
                   disabled={disabled}
                   placeholder="Ingrese la obra social"
                 />
                 <FieldError message={fieldErrors.medicalCoverage} />
 
-                <div>
+                <div className="ui buttons">
                   {disabled ? (
-                    <Button
-                      type="button"
-                      texto="Editar"
-                      onClick={() => setDisabled(false)}
-                    />
+                    <Button texto="Editar" type="button" onClick={() => setDisabled(false)} />
                   ) : (
                     <>
-                      <Button
-                        type="button"
-                        texto="Cancelar"
-                        color="red"
-                        onClick={() => setOpen(true)}
-                      />
-                      <Button
-                        type="submit"
-                        texto="Guardar"
-                        color="green"
-                      />
+                      <Button texto="Cancelar" type="button" onClick={() => setOpen(true)} color="red" />
+                      <Button texto="Guardar" type="submit" disabled={isEditingPatient} color="green" />
                     </>
                   )}
                 </div>
@@ -185,7 +187,7 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
       {open && (
         <Modal
           onCancel={() => setOpen(false)}
-          onConfirm={handleCancel}
+          onConfirm={handleCancelEdit}
           modalTitle="Cancelar edición"
           modalDescription={`¿Estás seguro de cancelar la edición del paciente ${firstName} ${lastName}?`}
         />
@@ -196,6 +198,9 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
 
 const mapStateToProps = (state) => ({
   patients: state.patient.patients,
+  isLoadingPatients: state.patient.isLoadingPatients,
+  isEditingPatient: state.patient.isEditingPatient,
+  errorEditPatient: state.patient.errorEditPatient,
 });
 
 const mapDispatchToProps = {
