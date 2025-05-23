@@ -17,7 +17,7 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(checkAuthThunk()); // importante
+    dispatch(checkAuthThunk());
   }, [dispatch]);
 
   return (
