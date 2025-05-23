@@ -1,5 +1,6 @@
 import React from 'react'
 import Button from './Button'
+import './Model.css'
 
 export default function Modal({
   productName,
@@ -15,12 +16,12 @@ export default function Modal({
         <p>{modalDescription} "{productName}"?</p>
         <div className="modal-actions">
           <Button
-            name='Cancelar'
+            texto='Cancelar'
             onClick={onCancel}
             type='button'
           />
           <Button
-            name='Confirmar'
+            texto='Confirmar'
             onClick={onConfirm}
             type='button'
             color='red'
