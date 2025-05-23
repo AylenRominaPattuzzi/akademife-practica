@@ -3,7 +3,7 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { connect } from 'react-redux';
 import { addPatient } from '../../redux/actions/patientActions';
-import { validateForm } from '../../utils/formUtils';
+import { validatePatient } from '../../utils/ValidateForm';
 import FieldError from '../../components/FieldError';
 import { useNavigate } from 'react-router-dom';
 import { Message } from '../../components/Message';
@@ -17,29 +17,26 @@ const CreatePatient = ({ addPatient }) => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showMessage, setShowMessage] = useState(false);
 
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    const errors = validateForm(
-      { firstName, lastName, dni, email, medicalCoverage },
-      ['firstName', 'lastName', 'dni']
-    );
-  
+
+    const patientData = { firstName, lastName, dni, email, medicalCoverage };
+    const errors = validatePatient(patientData); 
+
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
     }
-  
+
     setFieldErrors({});
-    await addPatient({ firstName, lastName, dni, email, medicalCoverage });
+    await addPatient(patientData);
     setShowMessage(true);
-  
+
     setTimeout(() => {
       navigate('/patients');
-    }, 2000); 
+    }, 2000);
   };
 
   return (
@@ -115,7 +112,7 @@ const CreatePatient = ({ addPatient }) => {
                 />
                 <FieldError message={fieldErrors.medicalCoverage} />
 
-                <Button type="submit" texto="Enviar" onClick={handleSubmit} />
+                <Button type="submit" texto="Enviar" />
               </form>
             </div>
           </div>

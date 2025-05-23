@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { fetchPatients, editPatient } from '../../redux/actions/patientActions';
 import { useNavigate, useParams } from 'react-router-dom';
-import { validateForm } from '../../utils/formUtils';
+
 import Input from '../../components/Input';
 import { Message } from '../../components/Message';
 import Button from '../../components/Button';
 import Modal from '../../components/Model';
 import FieldError from '../../components/FieldError';
+import { validatePatient } from '../../utils/ValidateForm';
 
 const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
   const { id } = useParams();
@@ -42,18 +43,18 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const errors = validateForm(
-      { firstName, lastName, dni, email, medicalCoverage },
-      ['firstName', 'lastName', 'dni']
-    );
+    const errors = validatePatient({ firstName, lastName, dni, email, medicalCoverage });
+
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
     }
 
+    setFieldErrors({});
     editPatient(id, { firstName, lastName, dni, email, medicalCoverage });
     setDisabled(true);
     setShowMessage(true);
+
     setTimeout(() => navigate('/patients'), 2000);
   };
 

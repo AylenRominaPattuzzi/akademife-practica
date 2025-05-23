@@ -5,8 +5,9 @@ import Loading from '../../components/Loading';
 import FieldError from '../../components/FieldError';
 import { connect } from 'react-redux';
 import { recoverPassword } from '../../redux/actions/userActions';
-import { validateForm } from '../../utils/formUtils';
+
 import { Message } from '../../components/Message';
+import { validateRecoverPassword } from '../../utils/ValidateForm';
 
 const RecoverPassword = ({ user, recoverPassword }) => {
   const [email, setEmail] = useState('');
@@ -21,16 +22,15 @@ const RecoverPassword = ({ user, recoverPassword }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     if (user.recoverPasswordLoading) return;
-
-    // Validamos solo el email
-    const errors = validateForm({ email }, ['email']);
+  
+    const errors = validateRecoverPassword({ email });
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
     }
-
+  
     setFieldErrors({});
     recoverPassword(email);
   };

@@ -6,6 +6,7 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import FieldError from '../../components/FieldError';
 import {Message} from '../../components/Message';
+import { validateResetPassword } from '../../utils/ValidateForm';
 
 const ResetPassword = ({ auth, resetPassword }) => {
   const { token } = useParams();
@@ -16,16 +17,17 @@ const ResetPassword = ({ auth, resetPassword }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (password.length < 8) {
-      setFieldError('La contraseña debe tener al menos 8 caracteres');
+  
+    const errors = validateResetPassword({ password });
+    if (Object.keys(errors).length > 0) {
+      setFieldError(errors.password);
       return;
     }
-
+  
     try {
       await resetPassword(token, password);
       setSuccess(true);
-      setTimeout(() => navigate('/login'), 3000); 
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
       setFieldError('Error al actualizar la contraseña');
     }

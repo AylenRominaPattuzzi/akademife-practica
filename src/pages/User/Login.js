@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Input from '../../components/Input'; 
-import Button from '../../components/Button'; 
-import FieldError from '../../components/FieldError'; 
-import { useNavigate, Link } from 'react-router-dom'; 
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import FieldError from '../../components/FieldError';
+import { useNavigate, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { loginUser } from '../../redux/actions/authActions';
-import { validateForm } from '../../utils/formUtils';
+import { validateLogin } from '../../utils/ValidateForm';
+
 
 const guardarTokenYRedirigir = (auth, navigate) => {
   localStorage.setItem('token', auth.token);
@@ -16,9 +17,9 @@ const guardarTokenYRedirigir = (auth, navigate) => {
 const Login = ({ auth, loginUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fieldErrors, setFieldErrors] = useState({}); 
+  const [fieldErrors, setFieldErrors] = useState({});
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (auth && auth.token) {
@@ -27,12 +28,11 @@ const Login = ({ auth, loginUser }) => {
   }, [auth, navigate]);
 
   const handleSubmit = (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
 
     if (auth.loading) return;
 
-    const errors = validateForm({ email, password }, ['email', 'password']);
-
+    const errors = validateLogin({ email, password });
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
