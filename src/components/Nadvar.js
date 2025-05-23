@@ -3,29 +3,26 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { logoutUser } from '../redux/actions/authActions';
 
-
 const Nadvar = ({ role, logoutUser }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logoutUser(); 
-    navigate('/login'); 
+    logoutUser();
+    navigate('/login');
   };
 
-  const isActive = (path) => location.pathname === path ? 'active' : '';
+  const isActive = (path) => (location.pathname === path ? 'active' : '');
 
-  console.log(role);
-  if(!role) return null;
-  
-  
+  // Si no hay rol, no mostramos el navbar (usuario no logueado)
+  if (!role) return null;
 
   return (
     <div className="ui container">
       <div className="ui secondary pointing menu">
-        <a className={`item ${isActive('/dashboard')}`} href="/">Página Principal</a>
+        <a className={`item ${isActive('/dashboard')}`} href="/dashboard">Página Principal</a>
         <a className={`item ${isActive('/patients')}`} href="/patients">Pacientes</a>
-        <a className={`item ${isActive('/doctors')}`} href="/patients">Doctores</a>
+        <a className={`item ${isActive('/doctors')}`} href="/doctors">Doctores</a>
         <a className={`item ${isActive('/appointments')}`} href="/appointments">Turnos</a>
 
         {role === 'admin' && (
@@ -44,13 +41,12 @@ const Nadvar = ({ role, logoutUser }) => {
   );
 };
 
-// Conectamos a Redux para obtener el usuario y hacer logout
 const mapStateToProps = (state) => ({
-  role: state.auth,
+  role: state.auth.role,
 });
 
 const mapDispatchToProps = {
-    logoutUser,
+  logoutUser,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Nadvar);

@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import CreatePatient from './pages/patient/CreatePatient';
 import ListPatients from './pages/patient/ListPatients';
-import Patient from './pages/patient/Patient';
+import Patient from './pages/patient/PatientDetail';
 import Nadvar from './components/Nadvar';
 
 

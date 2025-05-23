@@ -1,118 +1,132 @@
-import React, { useState } from 'react'
-import Input from '../../components/Input'
-import Button from '../../components/Button'
+import React, { useState } from 'react';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
 import { connect } from 'react-redux';
 import { addPatient } from '../../redux/actions/patientActions';
 import { validateForm } from '../../utils/formUtils';
 import FieldError from '../../components/FieldError';
 import { useNavigate } from 'react-router-dom';
+import { Message } from '../../components/Message';
 
-const Patient = ({ addPatient }) => {
+const CreatePatient = ({ addPatient }) => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [dni, setDni] = useState('');
+  const [email, setEmail] = useState('');
+  const [medicalCoverage, setMedicalCoverage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [showMessage, setShowMessage] = useState(false);
 
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [dni, setDni] = useState('')
-    const [email, setEmail] = useState('')
-    const [medicalCoverage, setMedicalCoverage] = useState('')
-    const [fieldErrors, setFieldErrors] = useState({});
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+  const navigate = useNavigate();
 
-        const errors = validateForm(
-            { firstName, lastName, dni, email, medicalCoverage },
-            ['firstName', 'lastName', 'dni']
-        );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const errors = validateForm(
+      { firstName, lastName, dni, email, medicalCoverage },
+      ['firstName', 'lastName', 'dni']
+    );
+  
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+  
+    setFieldErrors({});
+    await addPatient({ firstName, lastName, dni, email, medicalCoverage });
+    setShowMessage(true);
+  
+    setTimeout(() => {
+      navigate('/patients');
+    }, 2000); 
+  };
 
-        if (Object.keys(errors).length > 0) {
-            setFieldErrors(errors);
-            return;
-        }
+  return (
+    <div className="ui segment">
+      {showMessage && (
+        <Message message="Paciente agregado con éxito" stateMessage="positive" />
+      )}
 
-        setFieldErrors({});
-        addPatient({ firstName, lastName, dni, email, medicalCoverage });
-    };
+      <div className="ui middle aligned center aligned grid" style={{ height: '100vh' }}>
+        <div className="column" style={{ maxWidth: 450 }}>
+          <div className="ui card fluid">
+            <div className="content">
+              <form className="ui form" onSubmit={handleSubmit} noValidate>
+                <h2 className="ui header">Formulario Paciente</h2>
 
-    const navigate = useNavigate();
-    const handleListPatient = () => {
-        navigate('/patients');
-    };
+                <Input
+                  label="Nombre"
+                  type="text"
+                  placeholder="Ingrese el nombre del paciente"
+                  value={firstName}
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    setFieldErrors((prev) => ({ ...prev, firstName: '' }));
+                  }}
+                />
+                <FieldError message={fieldErrors.firstName} />
 
-    return (
-        <div className="ui middle aligned center aligned grid" style={{ height: '100vh' }}>
-            <div className="column" style={{ maxWidth: 450 }}>
-                <div className="ui card fluid">
-                    <div className="content">
-                        <form className="ui form" onSubmit={handleSubmit} noValidate>
-                            <h2 className="ui header">Formulario Paciente</h2>
-                            <Input
-                                label='Nombre'
-                                type='text'
-                                placeholder='Ingrese el nombre del paciente'
-                                value={firstName}
-                                onChange={(e) => {
-                                    setFirstName(e.target.value);
-                                    setFieldErrors((prev) => ({ ...prev, firstName: '' })); // Limpia error de ese campo
-                                }}
+                <Input
+                  label="Apellido"
+                  type="text"
+                  placeholder="Ingrese el apellido del paciente"
+                  value={lastName}
+                  onChange={(e) => {
+                    setLastName(e.target.value);
+                    setFieldErrors((prev) => ({ ...prev, lastName: '' }));
+                  }}
+                />
+                <FieldError message={fieldErrors.lastName} />
 
-                            />
-                            <FieldError message={fieldErrors.firstName} />
-                            <Input
-                                label='Apellido'
-                                type='text'
-                                placeholder='Ingrese el apellido del paciente'
-                                value={lastName}
-                                onChange={(e) => {
-                                    setLastName(e.target.value)
-                                    setFieldErrors((prev) => ({ ...prev, lastName: '' }));
-                                }}
-                            />
-                            <FieldError message={fieldErrors.lastName} />
-                            <Input
-                                label='DNI'
-                                type='text'
-                                placeholder='Ingrese el DNI del paciente'
-                                value={dni}
-                                onChange={(e) => {
-                                    setDni(e.target.value)
-                                    setFieldErrors((prev) => ({ ...prev, dni: '' }));
-                                }}
-                            />
-                            <FieldError message={fieldErrors.dni} />
-                            <Input
-                                label='Email'
-                                type='email'
-                                placeholder='Ingrese el email del paciente'
-                                value={email}
-                                onChange={(e) => {
-                                    setEmail(e.target.value)
-                                    setFieldErrors((prev) => ({ ...prev, email: '' }));
-                                }}
-                            />
-                            <FieldError message={fieldErrors.email} />
+                <Input
+                  label="DNI"
+                  type="text"
+                  placeholder="Ingrese el DNI del paciente"
+                  value={dni}
+                  onChange={(e) => {
+                    setDni(e.target.value);
+                    setFieldErrors((prev) => ({ ...prev, dni: '' }));
+                  }}
+                />
+                <FieldError message={fieldErrors.dni} />
 
-                            <Input
-                                label='Obra Social'
-                                type='text'
-                                placeholder='Ingrese la obra social del paciente'
-                                value={medicalCoverage}
-                                onChange={(e) => {
-                                    setMedicalCoverage(e.target.value)
-                                    setFieldErrors((prev) => ({ ...prev, medicalCoverage: '' }));
-                                }}
-                            />
-                            <FieldError message={fieldErrors.medicalCoverage} />
-                            <Button type="submit" texto='Enviar' onClick={handleListPatient} />
-                        </form>
-                    </div>
-                </div>
+                <Input
+                  label="Email"
+                  type="email"
+                  placeholder="Ingrese el email del paciente"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setFieldErrors((prev) => ({ ...prev, email: '' }));
+                  }}
+                />
+                <FieldError message={fieldErrors.email} />
+
+                <Input
+                  label="Obra Social"
+                  type="text"
+                  placeholder="Ingrese la obra social del paciente"
+                  value={medicalCoverage}
+                  onChange={(e) => {
+                    setMedicalCoverage(e.target.value);
+                    setFieldErrors((prev) => ({ ...prev, medicalCoverage: '' }));
+                  }}
+                />
+                <FieldError message={fieldErrors.medicalCoverage} />
+
+                <Button type="submit" texto="Enviar" onClick={handleSubmit} />
+              </form>
             </div>
+          </div>
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
 const mapDispatchToProps = {
-    addPatient
-}
-export default connect(null, mapDispatchToProps)(Patient);
+  addPatient,
+};
 
+export default connect(null, mapDispatchToProps)(CreatePatient);

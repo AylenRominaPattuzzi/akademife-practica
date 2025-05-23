@@ -7,7 +7,6 @@ import Input from '../../components/Input';
 import { Message } from '../../components/Message';
 import Button from '../../components/Button';
 import Modal from '../../components/Model';
-import Loader from '../../components/Loader';
 import FieldError from '../../components/FieldError';
 
 const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
@@ -69,8 +68,6 @@ const PatientDetail = ({ patients, fetchPatients, editPatient }) => {
     setDisabled(true);
     setOpen(false);
   };
-
-  // if (!patient) return <Loader />;
 
   return (
     <div className="ui segment">
