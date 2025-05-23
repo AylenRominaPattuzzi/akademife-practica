@@ -6,40 +6,40 @@ import FieldError from '../components/FieldError';
 import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { loginUser } from '../redux/actions/authActions';
-import { validateForm, guardarTokenYRedirigir } from '../utils/formUtils';
+import { validateForm } from '../utils/formUtils';
+
+// Función para guardar token y redirigir
+const guardarTokenYRedirigir = (auth, navigate) => {
+  localStorage.setItem('token', auth.token);
+  localStorage.setItem('role', auth.role);
+  navigate('/dashboard');
+};
 
 const Login = ({ auth, loginUser }) => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fieldErrors, setFieldErrors] = useState({}); 
 
   const navigate = useNavigate(); 
 
-  // useEffect que escucha si el usuario ya inició sesión correctamente
   useEffect(() => {
     if (auth && auth.token) {
-      // Guarda token en localStorage y redirige
       guardarTokenYRedirigir(auth, navigate);
     }
   }, [auth, navigate]);
 
-  // Maneja el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault(); 
 
-    //Previene múltiples envíos si ya se está cargando
     if (auth.loading) return;
 
-    const errors = validateForm(email, password);
+    const errors = validateForm({ email, password }, ['email', 'password']);
 
-    // Si hay errores, los setea en el estado y no continúa
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
     }
 
-    // Si no hay errores, borra errores anteriores y despacha acción de login
     setFieldErrors({});
     loginUser({ email, password });
   };
@@ -59,7 +59,7 @@ const Login = ({ auth, loginUser }) => {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  setFieldErrors((prev) => ({ ...prev, email: '' })); // Limpia error de ese campo
+                  setFieldErrors((prev) => ({ ...prev, email: '' }));
                 }}
               />
               <FieldError message={fieldErrors.email} />
@@ -71,7 +71,7 @@ const Login = ({ auth, loginUser }) => {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  setFieldErrors((prev) => ({ ...prev, password: '' })); // Limpia error de ese campo
+                  setFieldErrors((prev) => ({ ...prev, password: '' }));
                 }}
               />
               <FieldError message={fieldErrors.password} />
@@ -87,16 +87,12 @@ const Login = ({ auth, loginUser }) => {
   );
 };
 
-// Mapea el estado global (Redux) al componente como props
 const mapStateToProps = (state) => ({
-  auth: state.auth || {}, // Asegura que haya un objeto incluso si es undefined
+  auth: state.auth || {},
 });
 
-// Mapea la acción de login como prop
 const mapDispatchToProps = {
   loginUser,
 };
 
-// Exporta el componente conectado a Redux
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
-

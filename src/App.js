@@ -1,20 +1,25 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { checkAuthThunk } from "./redux/actions/authActions";
-import Login from "./pages/Login";
+import React from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import Login from './pages/Login';
+import CreatePatient from './pages/patient/CreatePatient';
+import ListPatients from './pages/patient/ListPatients';
+import Patient from './pages/patient/Patient';
+import Nadvar from './components/Nadvar';
 
-function App() {
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(checkAuthThunk());
-  }, [dispatch]);
-
+const App = () => {
   return (
-    <div className="App">
-      <Login />
+    <div className='ui container'>
+      <Nadvar />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/patients" element={<ListPatients />} />
+        <Route path="/patient/:id" element={<Patient />} />
+        <Route path="/create-patient" element={<CreatePatient />} />
+        <Route path="/" element={<Navigate to="/login" />} />
+      </Routes>
     </div>
   );
-}
+};
 
 export default App;

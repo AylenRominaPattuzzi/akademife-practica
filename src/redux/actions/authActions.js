@@ -11,7 +11,7 @@ export const loginUser = (credentials) => async (dispatch) => {
   dispatch({ type: LOGIN_REQUEST });
 
   try {
-    const response = await axiosInstance.post('/auth/login', credentials);
+    const response = await axiosInstance.post('/user/login', credentials);
     const { token, role } = response.data;
 
     // Guardar en localStorage

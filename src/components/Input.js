@@ -5,7 +5,9 @@ const Input = ({
   type = 'text',
   value,
   onChange,
-  placeholder = '' }) => {
+  placeholder = '',
+  disabled = false
+ }) => {
   return (
     <div className="field">
       <label>{label}</label>
@@ -14,6 +16,7 @@ const Input = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        disabled={disabled}
       />
     </div>
   )

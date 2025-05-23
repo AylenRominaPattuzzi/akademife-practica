@@ -1,13 +1,15 @@
 import React from 'react';
 
-const Button = ({ type, texto }) => {
+const Button = ({ type, texto, onClick, color="blue" }) => {
   return (
     <button
-      className="ui button"
-      type={type}>
+      className={`ui button ${color}`}
+      type={type}
+      onClick={onClick}
+    >
       {texto}
     </button>
   );
 };
 
-export default Button;
+export default Button; 
